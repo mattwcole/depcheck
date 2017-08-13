@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  depchecker:
+    image: depchecker:dev
+    build:
+      context: .
+    ports:
+      - "3000:80"
+    volumes:
+      - .:/app
+    entrypoint: /bin/bash -c 'yarn install && yarn start'

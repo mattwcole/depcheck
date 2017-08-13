@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  ci-build:
+    image: node:8.3.0
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: >
+      /bin/bash -c '
+        yarn install &&
+        yarn lint &&
+        yarn test &&
+        yarn build:prod &&
+        yarn install --production --modules-folder dist/node_modules
+      '

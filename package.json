@@ -1,0 +1,45 @@
+{
+  "name": "depcheck",
+  "version": "1.0.0",
+  "description": "Dependency checker for .NET Core",
+  "main": "dist/server.js",
+  "repository": "https://github.com/mattwcole/depcheck",
+  "author": "Matt Cole",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint",
+    "test": "jest",
+    "build:client": "webpack --config webpack/client/webpack.config.dev.babel.js",
+    "build:server": "webpack --config webpack/server/webpack.config.dev.babel.js",
+    "start": "run-p build:client build:server",
+    "build:client:prod": "webpack -p --config webpack/client/webpack.config.prod.babel.js",
+    "build:server:prod": "webpack --config webpack/server/webpack.config.prod.babel.js",
+    "build:prod": "run-p build:client:prod build:server:prod",
+    "start:prod": "cross-env NODE_ENV=production node dist/server.js"
+  },
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^4.4.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.2.0",
+    "html-webpack-plugin": "^2.30.1",
+    "jest": "^20.0.4",
+    "npm-run-all": "^4.0.2",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-hot-loader": "next",
+    "start-server-webpack-plugin": "^2.2.0",
+    "webpack": "^3.5.4",
+    "webpack-dev-middleware": "^1.12.0",
+    "webpack-hot-middleware": "^2.18.2",
+    "webpack-node-externals": "^1.6.0"
+  }
+}
