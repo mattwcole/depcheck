@@ -1,6 +1,6 @@
 # Depcheck
 
-Currently a boilerplate React app with with server side and client side hot reloading.
+Currently a boilerplate React app with server side and client side hot reloading.
 
 To run in Docker.
 

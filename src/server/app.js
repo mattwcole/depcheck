@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 
 app.get('/api', (req, res) => {
   res.send({
-    message: 'I am a hot reloadable API response. Change me and reload the page!',
+    message: 'I am a hot reloadable API response!',
   });
 });
 
