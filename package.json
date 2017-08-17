@@ -7,15 +7,29 @@
   "author": "Matt Cole",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint",
+    "precommit": "lint-staged",
+    "lint": "eslint webpack/** src/**",
     "test": "jest",
+    "prebuild": "rimraf dist",
+    "prebuild:debug": "rimraf dist",
+    "prebuild:prod": "rimraf dist",
+    "prestart": "rimraf dist",
     "build:client": "webpack --config webpack/client/webpack.config.dev.babel.js",
     "build:server": "webpack --config webpack/server/webpack.config.dev.babel.js",
-    "start": "run-p build:client build:server",
+    "build": "run-p build:client build:server",
+    "build:debug": "run-p \"build:client -- {@}\" \"build:server -- {@}\" -- --devtool source-map --hot=false",
     "build:client:prod": "webpack -p --config webpack/client/webpack.config.prod.babel.js",
     "build:server:prod": "webpack --config webpack/server/webpack.config.prod.babel.js",
     "build:prod": "run-p build:client:prod build:server:prod",
+    "start": "run-p \"build:client -- {@}\" \"build:server -- --env.start --watch {@}\" -- --display=minimal",
+    "start:debug": "run-s start -- --devtool source-map",
     "start:prod": "cross-env NODE_ENV=production node dist/server.js"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "dependencies": {
     "express": "^4.15.4"
@@ -31,11 +45,14 @@
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.2.0",
     "html-webpack-plugin": "^2.30.1",
+    "husky": "^0.14.3",
     "jest": "^20.0.4",
+    "lint-staged": "^4.0.3",
     "npm-run-all": "^4.0.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-hot-loader": "next",
+    "rimraf": "^2.6.1",
     "start-server-webpack-plugin": "^2.2.0",
     "webpack": "^3.5.4",
     "webpack-dev-middleware": "^1.12.0",

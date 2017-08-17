@@ -3,7 +3,7 @@ import nodeExternals from 'webpack-node-externals';
 import StartServerPlugin from 'start-server-webpack-plugin';
 import webpack from 'webpack';
 
-export default {
+export default env => ({
   entry: {
     server: [
       'webpack/hot/poll?1000',
@@ -17,7 +17,6 @@ export default {
   resolve: {
     extensions: ['.js'],
   },
-  watch: true,
   target: 'node',
   node: {
     __dirname: false,
@@ -49,13 +48,12 @@ export default {
     ],
   },
   plugins: [
-    new StartServerPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.EnvironmentPlugin({
       BUILD_TARGET: 'server',
-      NODE_ENV: 'development'
+      NODE_ENV: 'development',
     }),
-  ],
-};
+  ].concat(env && env.start ? [new StartServerPlugin({ nodeArgs: ['--inspect'] })] : []),
+});

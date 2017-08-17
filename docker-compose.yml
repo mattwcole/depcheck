@@ -1,12 +1,13 @@
-version: '2'
+version: '3'
 
 services:
-  depchecker:
-    image: depchecker:dev
+  depcheck:
+    image: depcheck:dev
     build:
       context: .
     ports:
-      - "3000:80"
+      - 3000:80
     volumes:
       - .:/app
+      - /app/node_modules
     entrypoint: /bin/bash -c 'yarn install && yarn start'
