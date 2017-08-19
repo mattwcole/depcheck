@@ -52,6 +52,7 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-hot-loader": "next",
+    "react-router-dom": "^4.1.2",
     "rimraf": "^2.6.1",
     "start-server-webpack-plugin": "^2.2.0",
     "webpack": "^3.5.4",
