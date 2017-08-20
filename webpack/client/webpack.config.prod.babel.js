@@ -8,7 +8,7 @@ export default {
   },
   output: {
     path: path.resolve(process.cwd(), 'dist/public'),
-    filename: '[name].js',
+    filename: '[name].[chunkhash].js',
     publicPath: '/',
   },
   resolve: {
@@ -39,6 +39,15 @@ export default {
     new webpack.EnvironmentPlugin({
       BUILD_TARGET: 'client',
       NODE_ENV: 'production',
+    }),
+    new webpack.HashedModuleIdsPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: module => module.context && module.context.includes('node_modules'),
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+      minChunks: Infinity,
     }),
   ],
 };
