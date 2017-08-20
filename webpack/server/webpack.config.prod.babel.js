@@ -11,7 +11,7 @@ export default {
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.js', '.jsx'],
   },
   target: 'node',
   node: {
@@ -22,7 +22,7 @@ export default {
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /(node_modules)/,
         use: [
           {
@@ -30,10 +30,8 @@ export default {
             options: {
               babelrc: false,
               presets: [
-                ['env', {
-                  modules: false,
-                  targets: { node: 'current' },
-                }],
+                ['env', { modules: false, targets: { node: 'current' } }],
+                'react',
               ],
             },
           },

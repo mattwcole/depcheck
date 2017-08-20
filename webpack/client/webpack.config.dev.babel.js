@@ -1,5 +1,6 @@
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import HtmlWebpackHarddiskPlugin from 'html-webpack-harddisk-plugin';
 import webpack from 'webpack';
 
 export default {
@@ -19,6 +20,7 @@ export default {
   resolve: {
     extensions: ['.js', '.jsx'],
   },
+  target: 'web',
   module: {
     rules: [
       {
@@ -45,7 +47,9 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/assets/index.html',
+      alwaysWriteToDisk: true,
     }),
+    new HtmlWebpackHarddiskPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -55,8 +59,11 @@ export default {
     }),
   ],
   devServer: {
-    host: 'localhost',
+    host: '0.0.0.0',
     port: 3001,
     hot: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { BrowserRouter } from 'react-router-dom';
-import App from './components/App';
+import App from '../common/components/App';
 
 // eslint-disable-next-line react/no-render-return-value
 const render = Component => ReactDOM.render(
@@ -17,7 +17,7 @@ const render = Component => ReactDOM.render(
 render(App);
 
 if (module.hot) {
-  module.hot.accept('./components/App', () => {
+  module.hot.accept('../common/components/App', () => {
     render(App);
   });
 }

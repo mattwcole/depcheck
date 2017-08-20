@@ -3,7 +3,7 @@ import nodeExternals from 'webpack-node-externals';
 import StartServerPlugin from 'start-server-webpack-plugin';
 import webpack from 'webpack';
 
-export default env => ({
+export default {
   entry: {
     server: [
       'webpack/hot/poll?1000',
@@ -15,7 +15,7 @@ export default env => ({
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.js', '.jsx'],
   },
   watch: true,
   target: 'node',
@@ -29,7 +29,7 @@ export default env => ({
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         exclude: /(node_modules)/,
         use: [
           {
@@ -37,10 +37,8 @@ export default env => ({
             options: {
               babelrc: false,
               presets: [
-                ['env', {
-                  modules: false,
-                  targets: { node: 'current' },
-                }],
+                ['env', { modules: false, targets: { node: 'current' } }],
+                'react',
               ],
             },
           },
@@ -58,4 +56,4 @@ export default env => ({
     }),
     new StartServerPlugin({ nodeArgs: ['--inspect'] }),
   ],
-});
+};
