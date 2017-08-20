@@ -6,14 +6,15 @@ export default {
   entry: {
     app: [
       'react-hot-loader/patch',
-      'webpack-hot-middleware/client',
+      'webpack-dev-server/client?http://localhost:3001',
+      'webpack/hot/only-dev-server',
       './src/client/index',
     ],
   },
   output: {
     path: path.resolve(process.cwd(), 'dist/public'),
     filename: '[name].js',
-    publicPath: '/',
+    publicPath: 'http://localhost:3001/',
   },
   resolve: {
     extensions: ['.js', '.jsx'],
@@ -53,4 +54,9 @@ export default {
       NODE_ENV: 'development',
     }),
   ],
+  devServer: {
+    host: 'localhost',
+    port: 3001,
+    hot: true,
+  },
 };

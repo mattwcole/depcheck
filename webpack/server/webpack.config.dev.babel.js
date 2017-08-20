@@ -17,6 +17,7 @@ export default env => ({
   resolve: {
     extensions: ['.js'],
   },
+  watch: true,
   target: 'node',
   node: {
     __dirname: false,
@@ -55,5 +56,6 @@ export default env => ({
       BUILD_TARGET: 'server',
       NODE_ENV: 'development',
     }),
-  ].concat(env && env.start ? [new StartServerPlugin({ nodeArgs: ['--inspect'] })] : []),
+    new StartServerPlugin({ nodeArgs: ['--inspect'] }),
+  ],
 });
