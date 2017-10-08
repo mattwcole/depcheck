@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../common/components/App';
+import '../assets/styles.sass';
 
-// eslint-disable-next-line react/no-render-return-value
-const render = Component => ReactDOM.render(
+const hydrate = Component => ReactDOM.hydrate(
   <BrowserRouter>
     <AppContainer>
       <Component />
@@ -14,10 +14,10 @@ const render = Component => ReactDOM.render(
   document.getElementById('app'),
 );
 
-render(App);
+hydrate(App);
 
 if (module.hot) {
   module.hot.accept('../common/components/App', () => {
-    render(App);
+    hydrate(App);
   });
 }

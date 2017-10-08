@@ -1,6 +1,9 @@
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import webpack from 'webpack';
+
+const extractSass = new ExtractTextPlugin('[name].[contenthash].css');
 
 export default {
   entry: {
@@ -30,9 +33,29 @@ export default {
           },
         ],
       },
+      {
+        test: /\.sass$/,
+        use: extractSass.extract({
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
+          ],
+        }),
+      },
     ],
   },
   plugins: [
+    extractSass,
     new HtmlWebpackPlugin({
       template: 'src/assets/index.html',
     }),
