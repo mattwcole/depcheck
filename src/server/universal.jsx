@@ -1,22 +1,17 @@
 import fs from 'fs';
-import util from 'util';
+import { promisify } from 'util';
 import path from 'path';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
+import { wrap } from 'async-middleware';
 import App from '../common/components/App';
 
-const readFile = util.promisify(fs.readFile);
+const readFile = promisify(fs.readFile);
 
-export default async (req, res) => {
-  let indexHtml;
-
-  try {
-    const indexHtmlPath = path.resolve(__dirname, 'public', 'index.html');
-    indexHtml = await readFile(indexHtmlPath, 'utf8');
-  } catch (err) {
-    return res.status(404).end();
-  }
+export default () => wrap(async (req, res) => {
+  const indexHtmlPath = path.resolve(__dirname, 'public', 'index.html');
+  const indexHtml = await readFile(indexHtmlPath, 'utf8');
 
   const routerContext = {};
   const appHtml = renderToString(
@@ -28,4 +23,4 @@ export default async (req, res) => {
   return routerContext.url
     ? res.redirect(routerContext.url)
     : res.send(indexHtml.replace('{{SSR}}', appHtml));
-};
+});
