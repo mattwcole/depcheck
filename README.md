@@ -1,6 +1,6 @@
 # Depcheck
 
-Currently a boilerplate universal React app with server side and client side hot reloading.
+Proof of concept web app for checking open source GitHub project dependencies.
 
 To run in Docker.
 
@@ -8,9 +8,11 @@ To run in Docker.
 docker-compose up
 ```
 
-To run locally.
+To run locally, ensure you have Node 8 installed.
 
 ```sh
 yarn install
 yarn start
 ```
+
+Browse the application at [http://localhost:3000](http://localhost:3000).
