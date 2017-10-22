@@ -7,7 +7,7 @@ const extractSass = new ExtractTextPlugin('[name].[contenthash].css');
 
 export default {
   entry: {
-    app: './src/client/index',
+    app: ['babel-polyfill', './src/client/index'],
   },
   output: {
     path: path.resolve(process.cwd(), 'dist/public'),
@@ -21,7 +21,7 @@ export default {
   module: {
     rules: [
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         exclude: /(node_modules)/,
         use: [
           {
@@ -90,5 +90,6 @@ export default {
       name: 'manifest',
       minChunks: Infinity,
     }),
+    new webpack.optimize.UglifyJsPlugin(),
   ],
 };

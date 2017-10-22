@@ -6,6 +6,9 @@
     <title>Depcheck</title>
   </head>
   <body>
-    <div id="app">{{SSR}}</div>
+    <div id="app">{{SSR_APP}}</div>
+    <script>
+      window.__INITIAL_STATE__ = {{SSR_STATE}};
+    </script>
   </body>
 </html>
