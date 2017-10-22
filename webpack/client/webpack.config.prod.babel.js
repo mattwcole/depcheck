@@ -28,7 +28,14 @@ export default {
             loader: 'babel-loader',
             options: {
               babelrc: false,
-              presets: ['env', 'react'],
+              presets: [
+                ['env', { modules: false }],
+                'stage-2',
+                'react',
+              ],
+              plugins: [
+                'transform-decorators-legacy',
+              ],
             },
           },
         ],
@@ -51,6 +58,17 @@ export default {
             },
           ],
         }),
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
       },
     ],
   },

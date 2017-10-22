@@ -8,7 +8,7 @@ To run in Docker.
 docker-compose up
 ```
 
-To run locally, ensure you have Node 8 installed.
+To run natively, ensure you have Node 8 and yarn installed.
 
 ```sh
 yarn install

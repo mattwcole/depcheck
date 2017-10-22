@@ -31,8 +31,24 @@ export default {
               babelrc: false,
               presets: [
                 ['env', { modules: false, targets: { node: 'current' } }],
+                'stage-2',
                 'react',
               ],
+              plugins: [
+                'transform-decorators-legacy',
+              ],
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              emitFile: false,
             },
           },
         ],

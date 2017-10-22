@@ -33,9 +33,11 @@ export default {
               babelrc: false,
               presets: [
                 ['env', { modules: false }],
+                'stage-2',
                 'react',
               ],
               plugins: [
+                'transform-decorators-legacy',
                 'react-hot-loader/babel',
               ],
             },
@@ -45,6 +47,17 @@ export default {
       {
         test: /\.sass$/,
         use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
       },
     ],
   },

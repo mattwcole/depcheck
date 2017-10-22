@@ -1,3 +1,4 @@
+import { useStaticRendering } from 'mobx-react';
 import fs from 'fs';
 import { promisify } from 'util';
 import path from 'path';
@@ -6,6 +7,8 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { wrap } from 'async-middleware';
 import App from '../common/components/App';
+
+useStaticRendering(true);
 
 const readFile = promisify(fs.readFile);
 
