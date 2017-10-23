@@ -15,22 +15,26 @@ useStaticRendering(true);
 
 const readFile = promisify(fs.readFile);
 
+const initStores = (stores, url) => {
+  let preRender = Promise.resolve();
+
+  routes.some((route) => {
+    const match = matchPath(url, route);
+    if (match && route.component.preRender) {
+      preRender = route.component.preRender({ ...stores, match });
+    }
+    return match;
+  });
+
+  return preRender;
+};
+
 export default () => wrap(async (req, res) => {
   const indexHtmlPath = path.resolve(__dirname, 'public', 'index.html');
   const indexHtml = await readFile(indexHtmlPath, 'utf8');
 
   const stores = createStores();
-
-  let initStores = Promise.resolve();
-  routes.some((route) => {
-    const match = matchPath(req.url, route);
-    if (match && route.preServerRender) {
-      initStores = route.preServerRender(stores, match);
-    }
-    return match;
-  });
-
-  await initStores;
+  await initStores(stores, req.url);
 
   const routerContext = {};
   const appHtml = renderToString(
@@ -47,15 +51,18 @@ export default () => wrap(async (req, res) => {
     return res.redirect(routerContext.url);
   }
 
-  const state = Object.assign(
-    ...Object.entries(stores).map(
-      entry => ({ [entry[0]]: entry[1].toJS() }),
-    ),
+  const appState = serializeJs(
+    Object.entries(stores).reduce((storeState, entry) => {
+      // eslint-disable-next-line no-param-reassign
+      storeState[entry[0]] = entry[1].toJS();
+      return storeState;
+    }, {}), {
+      isJSON: true,
+    });
+
+  return res.send(
+    indexHtml
+      .replace('{{SSR_APP}}', appHtml)
+      .replace('{{SSR_STATE}}', appState),
   );
-
-  const stateJson = serializeJs(state, {
-    isJSON: true,
-  });
-
-  return res.send(indexHtml.replace('{{SSR_APP}}', appHtml).replace('{{SSR_STATE}}', stateJson));
 });

@@ -6,17 +6,14 @@ import logo from '../../assets/logo.png';
 
 const menuItems = [
   {
-    key: 1,
     name: 'Home',
     to: '/',
   },
   {
-    key: 2,
     name: 'About',
     to: '/about',
   },
   {
-    key: 3,
     name: 'Test Repo',
     to: '/repos/mattwcole/gelf-extensions-logging',
   },
@@ -52,7 +49,7 @@ class Navbar extends Component {
         </div>
         <div className={`navbar-menu${this.menuActive ? ' is-active' : ''}`}>
           {menuItems.map(item => (
-            <Link key={item.key} className="navbar-item" to={item.to} onClick={this.hideMenu}>
+            <Link key={item.name} className="navbar-item" to={item.to} onClick={this.hideMenu}>
               {item.name}
             </Link>
           ))}

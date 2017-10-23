@@ -1,26 +1,32 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { inject, observer } from 'mobx-react';
-import { STORE_NAME } from '../stores/RepoStore';
 
-const initStore = store => store.fetchDependencySummary();
+const initStore = (repoStore, project) => repoStore.fetchDependencySummary(project);
 
-@inject(STORE_NAME) @observer
+@inject('repoStore') @observer
 class RepoPage extends Component {
-  static preServerRender(stores) {
-    return initStore(stores[STORE_NAME]);
+  static preRender({ repoStore, match: { params: project } }) {
+    return initStore(repoStore, project);
+  }
+
+  static propTypes = {
+    repoStore: PropTypes.shape({
+      value: PropTypes.string.isRequired,
+    }).isRequired,
   }
 
   componentWillMount() {
-    initStore(this.store);
+    RepoPage.preRender(this.props);
   }
 
-  store = this.props[STORE_NAME]
+  repoStore = this.props.repoStore
 
   render() {
     return (
       <div className="container">
         <h1 className="title">Repo</h1>
-        <p>The value from the store is {this.store.value}.</p>
+        <p>The value from the store is {this.repoStore.value}.</p>
       </div>
     );
   }

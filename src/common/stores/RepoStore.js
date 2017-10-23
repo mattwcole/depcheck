@@ -1,10 +1,6 @@
 import { observable, action, toJS } from 'mobx';
 
-export const STORE_NAME = 'repoStore';
-
 export default class RepoStore {
-  static storeName = STORE_NAME;
-
   @observable value = 'empty';
 
   constructor(state) {
