@@ -14,7 +14,7 @@ export default [
     component: AboutPage,
   },
   {
-    path: '/repos/:owner/:repo',
+    path: '/repos/:owner/:name',
     component: RepoPage,
   },
   {

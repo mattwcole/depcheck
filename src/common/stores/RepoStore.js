@@ -1,23 +1,25 @@
 import { observable, action, toJS } from 'mobx';
+import * as depcheckClient from '../lib/depcheckClient';
 
 export default class RepoStore {
-  @observable value = 'empty';
+  @observable dependencies;
 
   constructor(state) {
     if (state) {
-      this.value = state.value;
+      this.dependencies = state.dependencies;
     }
   }
 
   @action
-  async fetchDependencySummary() {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    this.value = new Date().toString();
+  async getDependencies(owner, name) {
+    if (!this.dependencies) {
+      this.dependencies = await depcheckClient.getRepoDependencies(owner, name);
+    }
   }
 
   toJS() {
     return toJS({
-      value: this.value,
+      dependencies: this.dependencies,
     });
   }
 }

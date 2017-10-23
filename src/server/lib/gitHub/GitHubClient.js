@@ -1,25 +1,14 @@
-import fetch from 'node-fetch';
-
-const parseResponse = async (response) => {
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
-
-  return response.json();
-};
+import Fetch from '../../../common/lib/http/Fetch';
 
 export default class GitHubClient {
   constructor(token) {
     this.token = token;
-    this.uri = 'https://api.github.com';
-  }
-
-  get headers() {
-    return {
-      Authorization: `Bearer ${this.token}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    };
+    this.fetch = new Fetch({
+      baseAddress: 'https://api.github.com',
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    });
   }
 
   async getLanguage(owner, repo) {
@@ -33,20 +22,15 @@ export default class GitHubClient {
       }
     }`;
 
-    const result = await this.sendQuery(query);
-    return result.data.repository.languages.nodes[0].name;
+    const response = await this.sendQuery(query);
+    return response.data.repository.languages.nodes[0].name;
   }
 
   async getFiles(owner, repo, extension) {
     // There is currently no way to search for files using the GraphQL API.
     const query = `repo:${owner}/${repo} filename:${extension}`;
-    const response = await fetch(`${this.uri}/search/code?q=${query}`, {
-      method: 'GET',
-      headers: this.headers,
-    });
-
-    const result = await parseResponse(response);
-    return result.items;
+    const response = await this.fetch.getJson(`/search/code?q=${query}`);
+    return response.items;
   }
 
   async getFilesContent(owner, repo, extension) {
@@ -64,22 +48,16 @@ export default class GitHubClient {
         ${innerQuery}
       }
     }`;
-    const result = await this.sendQuery(query);
+    const response = await this.sendQuery(query);
 
-    return Object.values(result.data.repository).map((file, i) => ({
+    return Object.values(response.data.repository).map((file, i) => ({
       name: files[i].name,
       path: files[i].path,
       content: file.text,
     }));
   }
 
-  async sendQuery(query) {
-    const response = await fetch(`${this.uri}/graphql`, {
-      method: 'POST',
-      body: JSON.stringify({ query }),
-      headers: this.headers,
-    });
-
-    return parseResponse(response);
+  sendQuery(query) {
+    return this.fetch.postJson('/graphql', { query });
   }
 }

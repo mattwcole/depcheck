@@ -6,7 +6,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter, matchPath } from 'react-router-dom';
 import { wrap } from 'async-middleware';
-import serializeJs from 'serialize-javascript';
+import serializeJS from 'serialize-javascript';
 import App from '../common/components/App';
 import createStores from '../common/stores/createStores';
 import routes from '../common/routes';
@@ -51,7 +51,7 @@ export default () => wrap(async (req, res) => {
     return res.redirect(routerContext.url);
   }
 
-  const appState = serializeJs(
+  const appState = serializeJS(
     Object.entries(stores).reduce((storeState, entry) => {
       // eslint-disable-next-line no-param-reassign
       storeState[entry[0]] = entry[1].toJS();
