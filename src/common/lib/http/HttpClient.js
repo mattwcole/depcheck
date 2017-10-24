@@ -1,9 +1,9 @@
 import fetch from 'isomorphic-fetch';
-import FetchError from './FetchError';
+import HttpError from './HttpError';
 
 const parseResponse = async (response) => {
   if (!response.ok) {
-    throw new FetchError(
+    throw new HttpError(
       `Request to ${response.url} failed with status "${response.statusText}"`,
       response.status, await response.text());
   }

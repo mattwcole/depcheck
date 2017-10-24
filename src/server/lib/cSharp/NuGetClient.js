@@ -1,8 +1,8 @@
-import Fetch from '../../../common/lib/http/Fetch';
+import HttpClient from '../../../common/lib/http/HttpClient';
 
 export default class NuGetClient {
   constructor() {
-    this.fetch = new Fetch({
+    this.fetch = new HttpClient({
       baseAddress: 'https://api.nuget.org/v3-flatcontainer',
     });
   }

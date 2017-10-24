@@ -1,9 +1,9 @@
-import Fetch from '../../../common/lib/http/Fetch';
+import HttpClient from '../../../common/lib/http/HttpClient';
 
 export default class GitHubClient {
   constructor(token) {
     this.token = token;
-    this.fetch = new Fetch({
+    this.fetch = new HttpClient({
       baseAddress: 'https://api.github.com',
       headers: {
         Authorization: `Bearer ${this.token}`,
