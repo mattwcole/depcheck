@@ -8,7 +8,7 @@ const App = () => (
     <Navbar />
     <section className="section">
       <Switch>
-        {routes.map(route => route.path && <Route key={route.path} {...route} />)}
+        {routes.map(route => <Route key={route.path || 404} {...route} />)}
       </Switch>
     </section>
   </div>

@@ -45,7 +45,9 @@ export default () => wrap(async (req, res) => {
     </StaticRouter>,
   );
 
-  // TODO: Status codes.
+  if (routerContext.status) {
+    res.status(routerContext.status);
+  }
 
   if (routerContext.url) {
     return res.redirect(routerContext.url);
