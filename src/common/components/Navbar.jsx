@@ -21,6 +21,11 @@ const menuItems = [
 
 @observer
 class Navbar extends Component {
+  componentDidMount() {
+    this.mounted = true;
+  }
+
+  @observable mounted = false;
   @observable menuActive = false;
 
   toggleMenu = () => {
@@ -42,6 +47,7 @@ class Navbar extends Component {
             <button
               className={`button navbar-burger${this.menuActive ? ' is-active' : ''}`}
               onClick={this.toggleMenu}
+              disabled={!this.mounted}
             >
               <span />
               <span />
