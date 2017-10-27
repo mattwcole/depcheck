@@ -33,28 +33,30 @@ class Navbar extends Component {
 
   render() {
     return (
-      <nav className="navbar" aria-label="main navigation">
-        <div className="navbar-brand">
-          <Link className="navbar-item" to="/">
-            <img src={logo} alt="depcheck" width="112" height="28" />
-          </Link>
-          <button
-            className={`button navbar-burger${this.menuActive ? ' is-active' : ''}`}
-            onClick={this.toggleMenu}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-        <div className={`navbar-menu${this.menuActive ? ' is-active' : ''}`}>
-          {menuItems.map(item => (
-            <Link key={item.name} className="navbar-item" to={item.to} onClick={this.hideMenu}>
-              {item.name}
+      <div className="container">
+        <nav className="navbar" aria-label="main navigation">
+          <div className="navbar-brand">
+            <Link className="navbar-item" to="/">
+              <img src={logo} alt="depcheck" width="112" height="28" />
             </Link>
-          ))}
-        </div>
-      </nav>
+            <button
+              className={`button navbar-burger${this.menuActive ? ' is-active' : ''}`}
+              onClick={this.toggleMenu}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
+          <div className={`navbar-menu${this.menuActive ? ' is-active' : ''}`}>
+            {menuItems.map(item => (
+              <Link key={item.name} className="navbar-item" to={item.to} onClick={this.hideMenu}>
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      </div>
     );
   }
 }
