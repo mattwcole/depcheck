@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { FormState, FieldState } from 'formstate';
 
@@ -14,6 +14,7 @@ export default class HomePage extends Component {
     }).isRequired,
   }
 
+  @action
   componentDidMount() {
     this.mounted = true;
     this.ownerInput.focus();

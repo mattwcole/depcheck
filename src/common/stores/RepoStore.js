@@ -1,4 +1,4 @@
-import { observable, action, toJS } from 'mobx';
+import { observable, action, runInAction, toJS } from 'mobx';
 import * as depcheckClient from '../lib/depcheckClient';
 
 export default class RepoStore {
@@ -13,7 +13,11 @@ export default class RepoStore {
   @action
   async getDependencies(owner, name) {
     if (!this.dependencies) {
-      this.dependencies = await depcheckClient.getRepoDependencies(owner, name);
+      const dependencies = await depcheckClient.getRepoDependencies(owner, name);
+
+      runInAction(() => {
+        this.dependencies = dependencies;
+      });
     }
   }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import { observer } from 'mobx-react';
 import logo from '../../assets/logo.png';
 
@@ -21,6 +21,7 @@ const menuItems = [
 
 @observer
 class Navbar extends Component {
+  @action
   componentDidMount() {
     this.mounted = true;
   }
@@ -28,10 +29,12 @@ class Navbar extends Component {
   @observable mounted = false;
   @observable menuActive = false;
 
+  @action
   toggleMenu = () => {
     this.menuActive = !this.menuActive;
   }
 
+  @action
   hideMenu = () => {
     this.menuActive = false;
   }
