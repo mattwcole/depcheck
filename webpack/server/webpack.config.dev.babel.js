@@ -49,7 +49,7 @@ export default {
         ],
       },
       {
-        test: /\.(png|jpg|gif)$/,
+        test: /\.(png|svg|jpg|gif)$/,
         use: [
           {
             loader: 'url-loader',
