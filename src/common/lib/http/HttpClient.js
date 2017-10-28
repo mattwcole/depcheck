@@ -5,7 +5,7 @@ const parseResponse = async (response) => {
   if (!response.ok) {
     throw new HttpError(
       `Request to ${response.url} failed with status "${response.statusText}"`,
-      response.status, await response.text());
+      response.status, await response.json());
   }
 
   return response.json();

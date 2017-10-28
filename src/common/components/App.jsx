@@ -1,11 +1,12 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import ErrorBoundary from './ErrorBoundary';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import routes from '../routes';
 
 const App = () => (
-  <div>
+  <ErrorBoundary>
     <Navbar />
     <section className="section">
       <Switch>
@@ -13,7 +14,7 @@ const App = () => (
       </Switch>
     </section>
     <Footer />
-  </div>
+  </ErrorBoundary>
 );
 
 export default App;

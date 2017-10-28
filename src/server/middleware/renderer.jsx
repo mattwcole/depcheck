@@ -7,9 +7,9 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter, matchPath } from 'react-router-dom';
 import { wrap } from 'async-middleware';
 import serializeJS from 'serialize-javascript';
-import App from '../common/components/App';
-import createStores from '../common/stores/createStores';
-import routes from '../common/routes';
+import App from '../../common/components/App';
+import createStores from '../../common/stores/createStores';
+import routes from '../../common/routes';
 
 useStaticRendering(true);
 

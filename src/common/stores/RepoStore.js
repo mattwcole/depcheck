@@ -4,20 +4,26 @@ import * as depcheckClient from '../lib/depcheckClient';
 export default class RepoStore {
   @observable dependencies;
 
-  constructor(state) {
+  constructor(state, errorStore) {
     if (state) {
       this.dependencies = state.dependencies;
     }
+
+    this.errorStore = errorStore;
   }
 
   @action
   async getDependencies(owner, name) {
     if (!this.dependencies) {
-      const dependencies = await depcheckClient.getRepoDependencies(owner, name);
+      try {
+        const dependencies = await depcheckClient.getRepoDependencies(owner, name);
 
-      runInAction(() => {
-        this.dependencies = dependencies;
-      });
+        runInAction(() => {
+          this.dependencies = dependencies;
+        });
+      } catch (error) {
+        this.errorStore.setError(error);
+      }
     }
   }
 
