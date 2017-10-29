@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'mobx-react';
 import createStores from '../common/stores/createStores';
 import App from '../common/components/App';
-import '../assets/styles.sass';
+import '../assets/styles.scss';
 
 // eslint-disable-next-line no-underscore-dangle
 const stores = createStores(window.__INITIAL_STATE__);

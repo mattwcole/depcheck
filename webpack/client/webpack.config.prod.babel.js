@@ -41,7 +41,7 @@ export default {
         ],
       },
       {
-        test: /\.sass$/,
+        test: /\.(scss|sass)$/,
         use: extractSass.extract({
           use: [
             {

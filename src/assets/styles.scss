@@ -1,4 +1,4 @@
-@import "~bulma/sass/utilities/initial-variables"
+@import '~bulma/sass/utilities/initial-variables';
 
 // TODO: https://github.com/postcss/autoprefixer
 // TODO: Only include what is needed to reduce bundle size.
@@ -8,14 +8,14 @@
 // $blue: #72d0eb
 // $pink: #ffb3b3
 // $pink-invert: #fff
-// $family-serif: "Merriweather", "Georgia", serif
+// $family-serif: 'Merriweather', 'Georgia', serif
 
 // $primary: $pink
 // $primary-invert: $pink-invert
 // $danger: $orange
 // $family-primary: $family-serif
 
-$fa-font-path: "../../node_modules/font-awesome/fonts";
+$fa-font-path: '../../node_modules/font-awesome/fonts';
 
-@import "~font-awesome/scss/font-awesome"
-@import "~bulma/bulma"
+@import '~font-awesome/scss/font-awesome';
+@import '~bulma/bulma';
