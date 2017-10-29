@@ -10,6 +10,8 @@ import '../assets/styles.scss';
 // eslint-disable-next-line no-underscore-dangle
 const stores = createStores(window.__INITIAL_STATE__);
 
+// TODO: Push unhandled promise rejections and window errors to error store using global handlers?
+
 const hydrate = Component => ReactDOM.hydrate(
   <BrowserRouter>
     <AppContainer>

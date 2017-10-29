@@ -10,7 +10,6 @@ if (process.env.GZIP === 'true') {
   app.use(compression());
 }
 
-// TODO: Error handling.
 app.use(express.static(path.resolve(__dirname, 'public'), { index: false }));
 app.use('/api', api());
 app.use('/', renderer());
