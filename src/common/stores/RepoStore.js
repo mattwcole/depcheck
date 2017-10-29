@@ -2,11 +2,12 @@ import { observable, action, runInAction, toJS } from 'mobx';
 import * as depcheckClient from '../lib/depcheckClient';
 
 export default class RepoStore {
-  @observable dependencies;
+  @observable.ref repo = {};
+  @observable loading = false;
 
   constructor(state, errorStore) {
     if (state) {
-      this.dependencies = state.dependencies;
+      this.repo = { ...state };
     }
 
     this.errorStore = errorStore;
@@ -14,22 +15,30 @@ export default class RepoStore {
 
   @action
   async getDependencies(owner, name) {
-    if (!this.dependencies) {
-      try {
-        const dependencies = await depcheckClient.getRepoDependencies(owner, name);
+    if (this.repo.owner === owner && this.repo.name === name) {
+      return;
+    }
 
-        runInAction(() => {
-          this.dependencies = dependencies;
-        });
-      } catch (error) {
-        this.errorStore.setError(error);
-      }
+    this.loading = true;
+
+    try {
+      const summary = await depcheckClient.getRepoDependencies(owner, name);
+
+      runInAction(() => {
+        this.repo = {
+          owner, name, summary,
+        };
+      });
+    } catch (error) {
+      this.errorStore.setError(error);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
     }
   }
 
   toJS() {
-    return toJS({
-      dependencies: this.dependencies,
-    });
+    return toJS(this.repo || {});
   }
 }

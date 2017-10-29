@@ -41,7 +41,7 @@ class Navbar extends Component {
 
   render() {
     return (
-      <div className="container">
+      <header className="container">
         <nav className="navbar" aria-label="main navigation">
           <div className="navbar-brand">
             <Link className="navbar-item" to="/">
@@ -65,7 +65,7 @@ class Navbar extends Component {
             ))}
           </div>
         </nav>
-      </div>
+      </header>
     );
   }
 }

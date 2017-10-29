@@ -8,11 +8,11 @@ import routes from '../routes';
 const App = () => (
   <ErrorBoundary>
     <Navbar />
-    <section className="section">
+    <main className="section">
       <Switch>
         {routes.map(route => <Route key={route.path || 404} {...route} />)}
       </Switch>
-    </section>
+    </main>
     <Footer />
   </ErrorBoundary>
 );

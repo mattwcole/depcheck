@@ -33,6 +33,7 @@ export default class CSharpProject {
 
       return {
         name: file.name,
+        path: file.path,
         dependencies: getDotNetCoreDependencies(project),
       };
     }));
@@ -79,6 +80,7 @@ export default class CSharpProject {
 
     return {
       name: project.name,
+      path: project.path,
       score: versioning.calculateProjectScore(packageScores),
       dependencies,
     };

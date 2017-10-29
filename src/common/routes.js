@@ -1,7 +1,7 @@
 import HomePage from './components/HomePage';
 import AboutPage from './components/AboutPage';
 import NotFoundPage from './components/NotFoundPage';
-import RepoPage from './components/RepoPage';
+import DependenciesPage from './components/DependenciesPage';
 
 export default [
   {
@@ -15,7 +15,7 @@ export default [
   },
   {
     path: '/repos/:owner/:name',
-    component: RepoPage,
+    component: DependenciesPage,
   },
   {
     component: NotFoundPage,

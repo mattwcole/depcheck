@@ -25,7 +25,12 @@ export default class ErrorBoundary extends Component {
     return error
       ? (
         <Status code={500}>
-          <h1>{error.toString()}</h1>
+          <main className="section">
+            <div className="container">
+              <h1 className="title">Oops</h1>
+              <p>{error.toString()}</p>
+            </div>
+          </main>
         </Status>
       )
       : this.props.children;
