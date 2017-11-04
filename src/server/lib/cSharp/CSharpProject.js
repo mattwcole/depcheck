@@ -1,23 +1,52 @@
 import { promisify } from 'util';
 import xml2js from 'xml2js';
-import * as versioning from '../versioning';
+import * as versioning from './nuGetVersioning';
 
 const parseXml = promisify(xml2js.parseString);
+const classicPackageRegex = /(\S+),\s+Version=(\d+\.\d+\.\d+(\.\d+)?(-\S+)?)/i;
 
-const getDotNetCoreDependencies = project => (project.Project.ItemGroup.reduce(
-  (packages, itemGroup) => (
-    itemGroup.PackageReference
-      ? packages.concat(itemGroup.PackageReference.map(packageRef => ({
-        id: packageRef.$.Include,
-        version: packageRef.$.Version,
-      })))
-      : packages),
-  [],
-));
+const getModernCsprojDependencies = project => (
+  project.Project.ItemGroup.reduce(
+    (packages, itemGroup) => (
+      itemGroup.PackageReference
+        ? packages.concat(itemGroup.PackageReference.map(packageRef => ({
+          id: packageRef.$.Include,
+          version: packageRef.$.Version,
+        })))
+        : packages),
+    [],
+  )
+);
 
-// const getDotNetFrameworkDependencies = (project) => {
+const getClassicCsprojDependencies = project => (
+  project.Project.ItemGroup.reduce(
+    (packages, itemGroup) => {
+      if (itemGroup.Reference) {
+        itemGroup.Reference.forEach((reference) => {
+          const match = classicPackageRegex.exec(reference.$.Include);
+          if (match) {
+            packages.push({
+              id: match[1],
+              version: match[2],
+            });
+          }
+        });
+      }
 
-// };
+      return packages;
+    },
+    [],
+  )
+);
+
+const getCsprojDependencies = (project) => {
+  const isModernProject = project.Project.PropertyGroup.some(
+    propertyGroup => propertyGroup.TargetFramework || propertyGroup.TargetFrameworks);
+
+  return isModernProject
+    ? getModernCsprojDependencies(project)
+    : getClassicCsprojDependencies(project);
+};
 
 export default class CSharpProject {
   constructor(gitHubClient, nuGetClient) {
@@ -34,7 +63,9 @@ export default class CSharpProject {
       return {
         name: file.name,
         path: file.path,
-        dependencies: getDotNetCoreDependencies(project),
+        dependencies: project.Project.ItemGroup
+          ? getCsprojDependencies(project)
+          : [],
       };
     }));
 
@@ -43,7 +74,6 @@ export default class CSharpProject {
 
   async getDependencySummary(owner, repo) {
     const dependenciesByProject = await this.getDependencies(owner, repo);
-
     const projectScores = [];
 
     const dependencySummaries = await Promise.all(

@@ -3,7 +3,7 @@ import HttpClient from '../../../common/lib/http/HttpClient';
 export default class GitHubClient {
   constructor(token) {
     this.token = token;
-    this.fetch = new HttpClient({
+    this.httpClient = new HttpClient({
       baseAddress: 'https://api.github.com',
       headers: {
         Authorization: `Bearer ${this.token}`,
@@ -29,7 +29,7 @@ export default class GitHubClient {
   async getFiles(owner, repo, extension) {
     // There is currently no way to search for files using the GraphQL API.
     const query = `repo:${owner}/${repo} filename:${extension}`;
-    const response = await this.fetch.getJson(`/search/code?q=${query}`);
+    const response = await this.httpClient.getJson(`/search/code?q=${query}`);
     return response.items;
   }
 
@@ -58,6 +58,6 @@ export default class GitHubClient {
   }
 
   sendQuery(query) {
-    return this.fetch.postJson('/graphql', { query });
+    return this.httpClient.postJson('/graphql', { query });
   }
 }

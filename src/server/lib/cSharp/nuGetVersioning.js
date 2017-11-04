@@ -1,16 +1,18 @@
-import semver from 'semver';
+import semver from '../extendedSemver';
 
 export const getLatestVersions = (versions) => {
   let latestStable;
   let latestPre;
 
-  versions.forEach((version) => {
+  for (let i = versions.length - 1; i >= 0 && !(latestStable && latestPre); i -= 1) {
+    const version = versions[i];
+
     if (semver.prerelease(version)) {
-      latestPre = version;
+      latestPre = latestPre || version;
     } else {
-      latestStable = version;
+      latestStable = latestStable || version;
     }
-  });
+  }
 
   return {
     latestStable, latestPre,
@@ -18,7 +20,18 @@ export const getLatestVersions = (versions) => {
 };
 
 export const calculatePackageScore = ({ current, latestStable, latestPre }) => {
-  const targetVersion = (semver.lte(current, latestStable || '0.0.0') && latestStable) || latestPre;
+  // TODO: The current version may be a range or contain wildcards.
+  // https://docs.microsoft.com/en-us/dotnet/core/tools/csproj#additions
+  // https://docs.microsoft.com/en-gb/nuget/reference/package-versioning#version-ranges-and-wildcards
+
+  const targetVersion = semver.lte(current, latestStable || '0.0.0')
+    ? latestStable
+    : latestPre;
+
+  if (!targetVersion) {
+    return 0;
+  }
+
   const versionDiff = semver.diff(current, targetVersion);
 
   switch (versionDiff) {
@@ -26,15 +39,18 @@ export const calculatePackageScore = ({ current, latestStable, latestPre }) => {
       return 1;
     case 'prerelease':
       return 2;
+    case 'preextra':
+    case 'extra':
+      return 3;
     case 'prepatch':
     case 'patch':
-      return 3;
+      return 4;
     case 'preminor':
     case 'minor':
-      return 4;
+      return 5;
     case 'premajor':
     case 'major':
-      return 5;
+      return 6;
     default:
       throw new Error(`Unknown semver diff ${versionDiff}`);
   }

@@ -3,9 +3,10 @@ import HttpError from './HttpError';
 
 const parseResponse = async (response) => {
   if (!response.ok) {
+    // TODO: Check Content-Type and try to parse JSON/XML.
     throw new HttpError(
       `Request to ${response.url} failed with status "${response.statusText}"`,
-      response.status, await response.json());
+      response.status, await response.text());
   }
 
   return response.json();
