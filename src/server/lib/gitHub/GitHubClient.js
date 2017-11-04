@@ -1,4 +1,5 @@
 import HttpClient from '../../../common/lib/http/HttpClient';
+import GitHubError from './GitHubError';
 
 export default class GitHubClient {
   constructor(token) {
@@ -23,6 +24,11 @@ export default class GitHubClient {
     }`;
 
     const response = await this.sendQuery(query);
+
+    if (response.errors) {
+      throw new GitHubError('GitHub API query failed.', response.errors);
+    }
+
     return response.data.repository.languages.nodes[0].name;
   }
 

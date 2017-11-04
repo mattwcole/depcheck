@@ -12,7 +12,7 @@ const parseResponse = async (response) => {
   return response.json();
 };
 
-export default class Fetch {
+export default class HttpClient {
   constructor(options = {}) {
     this.options = options;
   }
@@ -55,4 +55,3 @@ export default class Fetch {
     return parseResponse(response);
   }
 }
-
