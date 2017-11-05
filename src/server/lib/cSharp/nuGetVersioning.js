@@ -1,12 +1,13 @@
-import semver from '../extendedSemver';
-import VersionError from '../VersionError';
+import semver from '../versioning/extendedSemver';
+import VersionError from '../versioning/VersionError';
+import versionMatcherFactory from './versionMatcherFactory';
 
-export const getLatestVersions = (versions) => {
+export const getLatestVersions = (allVersions) => {
   let latestStable;
   let latestPre;
 
-  for (let i = versions.length - 1; i >= 0 && !(latestStable && latestPre); i -= 1) {
-    const version = versions[i];
+  for (let i = allVersions.length - 1; i >= 0 && !(latestStable && latestPre); i -= 1) {
+    const version = allVersions[i];
 
     if (semver.prerelease(version)) {
       latestPre = latestPre || version;
@@ -20,17 +21,26 @@ export const getLatestVersions = (versions) => {
   };
 };
 
-export const calculatePackageScore = ({ current, latestStable, latestPre }) => {
-  // TODO: The current version may be a range or contain wildcards.
-  // https://docs.microsoft.com/en-us/dotnet/core/tools/csproj#additions
-  // https://docs.microsoft.com/en-gb/nuget/reference/package-versioning#version-ranges-and-wildcards
-  // http://localhost:3000/repos/autofixture/autofixture
-  // http://localhost:3000/repos/openiddict/openiddict-core
+export const getEffectiveVersion = (displayVersion, allVersions) => {
+  const versionMatcher = versionMatcherFactory(displayVersion);
 
+  let matchingVersion;
+  allVersions.some((version) => {
+    if (versionMatcher.satisfies(version)) {
+      matchingVersion = version;
+      return true;
+    }
+    return false;
+  });
+
+  return matchingVersion;
+};
+
+export const calculatePackageScore = ({ effective, latestStable, latestPre }) => {
   let versionDiff;
 
   try {
-    const targetVersion = semver.lte(current, latestStable || '0.0.0')
+    const targetVersion = semver.lte(effective, latestStable || '0.0.0')
       ? latestStable
       : latestPre;
 
@@ -38,7 +48,7 @@ export const calculatePackageScore = ({ current, latestStable, latestPre }) => {
       return 0;
     }
 
-    versionDiff = semver.diff(current, targetVersion);
+    versionDiff = semver.diff(effective, targetVersion);
   } catch (error) {
     if (error instanceof VersionError) {
       return 0;

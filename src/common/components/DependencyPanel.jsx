@@ -20,7 +20,7 @@ const DependencyPanel = ({ project }) => (
             {project.dependencies.map(dependency => (
               <tr key={dependency.id}>
                 <td>{dependency.id}</td>
-                <td>{dependency.versions.current}</td>
+                <td>{dependency.versions.display}</td>
                 <td>{dependency.versions.latestStable || '-'}</td>
                 <td>{dependency.versions.latestPre || '-'}</td>
                 <td>{dependency.score}</td>

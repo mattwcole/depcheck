@@ -107,7 +107,11 @@ export default class CSharpProject {
     const dependencies = await Promise.all(project.dependencies.map(async (dependency) => {
       const allVersions = await this.nuGetClient.getVersions(dependency.id);
       const latestVersions = versioning.getLatestVersions(allVersions);
-      const versions = Object.assign({ current: dependency.version }, latestVersions);
+      const versions = {
+        display: dependency.version,
+        effective: versioning.getEffectiveVersion(dependency.version, allVersions),
+        ...latestVersions,
+      };
       const packageScore = versioning.calculatePackageScore(versions);
 
       packageScores.push(packageScore);
