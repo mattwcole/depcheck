@@ -1,4 +1,5 @@
 import semver from '../extendedSemver';
+import VersionError from '../VersionError';
 
 export const getLatestVersions = (versions) => {
   let latestStable;
@@ -23,16 +24,27 @@ export const calculatePackageScore = ({ current, latestStable, latestPre }) => {
   // TODO: The current version may be a range or contain wildcards.
   // https://docs.microsoft.com/en-us/dotnet/core/tools/csproj#additions
   // https://docs.microsoft.com/en-gb/nuget/reference/package-versioning#version-ranges-and-wildcards
+  // http://localhost:3000/repos/autofixture/autofixture
+  // http://localhost:3000/repos/openiddict/openiddict-core
 
-  const targetVersion = semver.lte(current, latestStable || '0.0.0')
-    ? latestStable
-    : latestPre;
+  let versionDiff;
 
-  if (!targetVersion) {
-    return 0;
+  try {
+    const targetVersion = semver.lte(current, latestStable || '0.0.0')
+      ? latestStable
+      : latestPre;
+
+    if (!targetVersion) {
+      return 0;
+    }
+
+    versionDiff = semver.diff(current, targetVersion);
+  } catch (error) {
+    if (error instanceof VersionError) {
+      return 0;
+    }
+    throw error;
   }
-
-  const versionDiff = semver.diff(current, targetVersion);
 
   switch (versionDiff) {
     case null:

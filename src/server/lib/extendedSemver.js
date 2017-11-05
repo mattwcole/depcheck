@@ -1,56 +1,72 @@
 import semver from 'semver';
+import VersionError from './VersionError';
 
 const prereleaseRegex = /^\d+\.\d+\.\d+\.\d+(-\S+)$/;
 const versionPartsRegex = /^(\d+)\.(\d+)\.(\d+)(\.(\d+))?(-\S+)?$/;
+
+const parseDigit = digit => parseInt(digit || '0', 10);
+
+const getVersionParts = (version) => {
+  const match = versionPartsRegex.exec(version);
+
+  if (!match) {
+    throw new VersionError(`${version} is not a valid 3/4 digit version.`, version);
+  }
+
+  return {
+    major: parseDigit(match[1]),
+    minor: parseDigit(match[2]),
+    patch: parseDigit(match[3]),
+    extra: parseDigit(match[5]),
+    prerelease: match[6] || '',
+  };
+};
 
 export default {
   prerelease: (version) => {
     const match = prereleaseRegex.exec(version);
     if (match) {
-      return (match[1] && semver.prerelease(`0.0.0${match[1]}`)) || null;
+      return match[1]
+        ? semver.prerelease(`0.0.0${match[1]}`)
+        : null;
     }
 
     return semver.prerelease(version);
   },
 
   lte: (version1, version2) => {
-    const match1 = versionPartsRegex.exec(version1);
-    const match2 = versionPartsRegex.exec(version2);
+    const parts1 = getVersionParts(version1);
+    const parts2 = getVersionParts(version2);
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const part of [1, 2, 3, 5]) {
-      const part1 = parseInt(match1[part] || '0', 10);
-      const part2 = parseInt(match2[part] || '0', 10);
+    for (const partName of ['major', 'minor', 'patch', 'extra']) {
+      const part1 = parts1[partName];
+      const part2 = parts2[partName];
 
       if (part1 !== part2) {
         return part1 < part2;
       }
     }
 
-    return semver.lte(`0.0.0${match1[6] || ''}`, `0.0.0${match2[6] || ''}`);
+    return semver.lte(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
   },
 
   diff: (version1, version2) => {
-    const match1 = versionPartsRegex.exec(version1);
-    const match2 = versionPartsRegex.exec(version2);
+    const parts1 = getVersionParts(version1);
+    const parts2 = getVersionParts(version2);
 
-    const prefix = match1[6] || match2[6] ? 'pre' : '';
+    const prefix = (parts1.prerelease || parts2.prerelease) ? 'pre' : '';
 
     // eslint-disable-next-line no-restricted-syntax
-    for (const part of [
-      { index: 1, name: 'major' },
-      { index: 2, name: 'minor' },
-      { index: 3, name: 'patch' },
-      { index: 5, name: 'extra' },
-    ]) {
-      const part1 = parseInt(match1[part.index] || '0', 10);
-      const part2 = parseInt(match2[part.index] || '0', 10);
+    for (const partName of ['major', 'minor', 'patch', 'extra']) {
+      const part1 = parts1[partName];
+      const part2 = parts2[partName];
 
       if (part1 !== part2) {
-        return `${prefix}${part.name}`;
+        return `${prefix}${partName}`;
       }
     }
 
-    return match1[6] !== match2[6] ? 'prerelease' : null;
+    return parts1.prerelease !== parts2.prerelease ? 'prerelease' : null;
   },
 };
