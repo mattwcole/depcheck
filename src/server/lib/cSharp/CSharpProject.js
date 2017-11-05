@@ -1,9 +1,9 @@
-import { promisify } from 'util';
-import xml2js from 'xml2js';
+import parseXml from '../xmlParser';
 import * as versioning from './nuGetVersioning';
+import PropsResolver from './PropsResolver';
 
-const parseXml = promisify(xml2js.parseString);
 const classicPackageRegex = /(\S+),\s+Version=(\d+\.\d+\.\d+(\.\d+)?(-\S+)?)/i;
+const propRegex = /^\$\((\S+)\)$/;
 
 const getModernCsprojDependencies = project => (
   project.Project.ItemGroup.reduce(
@@ -56,16 +56,27 @@ export default class CSharpProject {
 
   async getDependencies(owner, repo) {
     const projectFiles = await this.gitHubClient.getFilesContent(owner, repo, '*.csproj');
+    const propsResolver = new PropsResolver(owner, repo, this.gitHubClient);
 
-    const projectDependencies = await Promise.all(projectFiles.map(async (file) => {
-      const project = await parseXml(file.content);
+    const projectDependencies = await Promise.all(projectFiles.map(async (projectFile) => {
+      const project = await parseXml(projectFile.content);
+
+      const dependencies = project.Project.ItemGroup
+        ? getCsprojDependencies(project)
+        : [];
+
+      await Promise.all(dependencies.map(async (dependency) => {
+        const propMatch = propRegex.exec(dependency.version);
+        if (propMatch) {
+          // eslint-disable-next-line no-param-reassign
+          dependency.version = await propsResolver.getValue(propMatch[1]);
+        }
+      }));
 
       return {
-        name: file.name,
-        path: file.path,
-        dependencies: project.Project.ItemGroup
-          ? getCsprojDependencies(project)
-          : [],
+        name: projectFile.name,
+        path: projectFile.path,
+        dependencies,
       };
     }));
 
