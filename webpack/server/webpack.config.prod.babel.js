@@ -59,6 +59,7 @@ export default {
     new webpack.EnvironmentPlugin({
       BUILD_TARGET: 'server',
       NODE_ENV: 'production',
+      CACHE: 'redis',
     }),
   ],
 };

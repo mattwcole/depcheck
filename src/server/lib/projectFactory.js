@@ -6,8 +6,14 @@ import NuGetClient from './cSharp/NuGetClient';
 import NuGetClientCache from './cSharp/NuGetClientCache';
 import JavaScriptProject from './javaScript/JavaScriptProject';
 import DevCache from './cache/DevCache';
+import RedisCache from './cache/RedisCache';
 
-const cache = new DevCache();
+const cache = process.env.CACHE === 'redis'
+  ? new RedisCache({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  })
+  : new DevCache();
 
 export default async ({ owner, repo, token }) => {
   const gitHubClient = new GitHubClientCache(new GitHubClient(token), cache);

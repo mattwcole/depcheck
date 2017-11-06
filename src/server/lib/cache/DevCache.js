@@ -3,11 +3,11 @@ export default class DevCache {
     this.cache = {};
   }
 
-  get(key) {
+  async get(key) {
     return this.cache[key];
   }
 
-  put(key, value) {
+  async set(key, value) {
     this.cache[key] = value;
   }
 

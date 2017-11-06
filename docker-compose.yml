@@ -1,14 +1,25 @@
 version: '3'
 
 services:
-  depcheck:
+  app:
     image: depcheck:dev
     build:
       context: .
+    environment:
+      - CACHE=redis
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
     ports:
       - 3000:80
       - 3001:3001
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/dist
     entrypoint: /bin/bash -c 'yarn install && yarn start'
+  redis:
+    image: redis:4.0.2
+    ports:
+      - 6379:6379
+
