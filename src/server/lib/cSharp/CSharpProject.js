@@ -23,6 +23,8 @@ const getClassicCsprojDependencies = project => (
     (packages, itemGroup) => {
       if (itemGroup.Reference) {
         itemGroup.Reference.forEach((reference) => {
+          // TODO: Use HintPath within reference and remove duplicates.
+          // http://localhost:3000/repos/bitrave/azure-mobile-services-for-unity3d
           const match = classicPackageRegex.exec(reference.$.Include);
           if (match) {
             packages.push({
@@ -107,6 +109,7 @@ export default class CSharpProject {
     const dependencies = await Promise.all(project.dependencies.map(async (dependency) => {
       const allVersions = await this.nuGetClient.getVersions(dependency.id);
       const latestVersions = versioning.getLatestVersions(allVersions);
+      // TODO: Effective version may need to be revisited for classic projects.
       const versions = {
         display: dependency.version,
         effective: versioning.getEffectiveVersion(dependency.version, allVersions),

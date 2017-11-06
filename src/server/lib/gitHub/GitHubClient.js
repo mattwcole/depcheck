@@ -63,7 +63,13 @@ export default class GitHubClient {
     }));
   }
 
-  sendQuery(query) {
-    return this.httpClient.postJson('/graphql', { query });
+  async sendQuery(query) {
+    const response = await this.httpClient.postJson('/graphql', { query });
+
+    if (response.errors) {
+      throw new GitHubError('GitHub GraphQL API query failed.', response.errors);
+    }
+
+    return response;
   }
 }

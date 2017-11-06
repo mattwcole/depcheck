@@ -11,6 +11,7 @@ const DependencyPanel = ({ project }) => (
             <tr>
               <th>Package</th>
               <th>Version</th>
+              <th>Effective Version</th>
               <th>Latest Stable</th>
               <th>Latest Pre</th>
               <th>Score</th>
@@ -21,6 +22,7 @@ const DependencyPanel = ({ project }) => (
               <tr key={dependency.id}>
                 <td>{dependency.id}</td>
                 <td>{dependency.versions.display}</td>
+                <td>{dependency.versions.effective || '-'}</td>
                 <td>{dependency.versions.latestStable || '-'}</td>
                 <td>{dependency.versions.latestPre || '-'}</td>
                 <td>{dependency.score}</td>
