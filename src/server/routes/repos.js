@@ -11,7 +11,7 @@ export default () => {
       owner, repo, token: process.env.GITHUB_API_TOKEN,
     });
 
-    const dependencySummary = await project.getDependencySummary(owner, repo);
+    const dependencySummary = await project.getRepoDependencySummary(owner, repo);
 
     res.json(dependencySummary);
   }));

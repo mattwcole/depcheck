@@ -42,6 +42,10 @@ export default class GitHubClient {
   async getFilesContent(owner, repo, extension) {
     const files = await this.getFiles(owner, repo, extension);
 
+    if (files.length === 0) {
+      return [];
+    }
+
     const innerQuery = files.reduce((query, file, i) =>
       `${query}
       file${i}: object(expression: "${/ref=(\w+)/.exec(file.url)[1]}:${file.path}") {

@@ -1,7 +1,7 @@
 {
   "name": "depcheck",
   "version": "1.0.0",
-  "description": "Dependency checker for .NET Core",
+  "description": "Dependency checker for projects in GitHub",
   "main": "dist/server.js",
   "repository": "https://github.com/mattwcole/depcheck",
   "author": "Matt Cole",

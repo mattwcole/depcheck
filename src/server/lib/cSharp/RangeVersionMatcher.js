@@ -12,6 +12,10 @@ export default class RangeVersionMatcher {
   }
 
   satisfies(version) {
+    if (semver.prerelease(version)) {
+      return false;
+    }
+
     let pass = true;
 
     if (this.openingBracket === '[') {

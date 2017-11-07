@@ -21,6 +21,7 @@ export const getLatestVersions = (allVersions) => {
   };
 };
 
+// https://docs.microsoft.com/en-us/nuget/reference/package-versioning#version-ranges-and-wildcards
 export const getEffectiveVersion = (displayVersion, allVersions) => {
   const versionMatcher = versionMatcherFactory(displayVersion);
 

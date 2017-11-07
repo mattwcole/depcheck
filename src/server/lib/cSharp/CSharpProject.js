@@ -2,7 +2,10 @@ import parseXml from '../xmlParser';
 import * as versioning from './nuGetVersioning';
 import PropsResolver from './PropsResolver';
 
-const classicPackageRegex = /(\S+),\s+Version=(\d+\.\d+\.\d+(\.\d+)?(-\S+)?)/i;
+// TODO: Make other regex patterns use non capturing groups.
+
+// eslint-disable-next-line no-useless-escape
+const classicPackageRegex = /packages(?:\\|\/)([\.\-\w]+?)\.(\d+\.\d+\.\d+(?:\.\d+)?(?:-[\.\-\w]+)?)(?:\\|\/)/i;
 const propRegex = /^\$\((\S+)\)$/;
 
 const getModernCsprojDependencies = project => (
@@ -18,19 +21,32 @@ const getModernCsprojDependencies = project => (
   )
 );
 
-const getClassicCsprojDependencies = project => (
-  project.Project.ItemGroup.reduce(
+const getClassicCsprojDependencies = (project) => {
+  const packageHash = {};
+
+  return project.Project.ItemGroup.reduce(
     (packages, itemGroup) => {
       if (itemGroup.Reference) {
         itemGroup.Reference.forEach((reference) => {
-          // TODO: Use HintPath within reference and remove duplicates.
-          // http://localhost:3000/repos/bitrave/azure-mobile-services-for-unity3d
-          const match = classicPackageRegex.exec(reference.$.Include);
+          const match = reference.HintPath && classicPackageRegex.exec(reference.HintPath);
           if (match) {
-            packages.push({
-              id: match[1],
-              version: match[2],
-            });
+            const packageId = match[1];
+            const packageVersion = match[2];
+
+            const existingVersion = packageHash[packageId];
+            if (existingVersion) {
+              if (existingVersion !== packageVersion) {
+                throw new Error(`Project contains references to ${packageId} ` +
+                  `versions ${existingVersion} and ${packageVersion}`);
+              }
+            } else {
+              packageHash[packageId] = packageVersion;
+
+              packages.push({
+                id: packageId,
+                version: packageVersion,
+              });
+            }
           }
         });
       }
@@ -38,16 +54,7 @@ const getClassicCsprojDependencies = project => (
       return packages;
     },
     [],
-  )
-);
-
-const getCsprojDependencies = (project) => {
-  const isModernProject = project.Project.PropertyGroup.some(
-    propertyGroup => propertyGroup.TargetFramework || propertyGroup.TargetFrameworks);
-
-  return isModernProject
-    ? getModernCsprojDependencies(project)
-    : getClassicCsprojDependencies(project);
+  );
 };
 
 export default class CSharpProject {
@@ -56,28 +63,37 @@ export default class CSharpProject {
     this.nuGetClient = nuGetClient;
   }
 
-  async getDependencies(owner, repo) {
+  async getDependenciesByProject(owner, repo) {
     const projectFiles = await this.gitHubClient.getFilesContent(owner, repo, '*.csproj');
     const propsResolver = new PropsResolver(owner, repo, this.gitHubClient);
 
     const projectDependencies = await Promise.all(projectFiles.map(async (projectFile) => {
       const project = await parseXml(projectFile.content);
 
-      const dependencies = project.Project.ItemGroup
-        ? getCsprojDependencies(project)
-        : [];
+      const isModernProject = project.Project.PropertyGroup && project.Project.PropertyGroup.some(
+        propertyGroup => propertyGroup.TargetFramework || propertyGroup.TargetFrameworks);
 
-      await Promise.all(dependencies.map(async (dependency) => {
-        const propMatch = propRegex.exec(dependency.version);
-        if (propMatch) {
-          // eslint-disable-next-line no-param-reassign
-          dependency.version = await propsResolver.getValue(propMatch[1]);
+      let dependencies = [];
+      if (project.Project.ItemGroup) {
+        if (isModernProject) {
+          dependencies = getModernCsprojDependencies(project);
+
+          await Promise.all(dependencies.map(async (dependency) => {
+            const propMatch = propRegex.exec(dependency.version);
+            if (propMatch) {
+              // eslint-disable-next-line no-param-reassign
+              dependency.version = await propsResolver.getValue(propMatch[1]);
+            }
+          }));
+        } else {
+          dependencies = getClassicCsprojDependencies(project);
         }
-      }));
+      }
 
       return {
         name: projectFile.name,
         path: projectFile.path,
+        isClassic: !isModernProject,
         dependencies,
       };
     }));
@@ -85,8 +101,8 @@ export default class CSharpProject {
     return projectDependencies;
   }
 
-  async getDependencySummary(owner, repo) {
-    const dependenciesByProject = await this.getDependencies(owner, repo);
+  async getRepoDependencySummary(owner, repo) {
+    const dependenciesByProject = await this.getDependenciesByProject(owner, repo);
     const projectScores = [];
 
     const dependencySummaries = await Promise.all(
@@ -109,10 +125,11 @@ export default class CSharpProject {
     const dependencies = await Promise.all(project.dependencies.map(async (dependency) => {
       const allVersions = await this.nuGetClient.getVersions(dependency.id);
       const latestVersions = versioning.getLatestVersions(allVersions);
-      // TODO: Effective version may need to be revisited for classic projects.
       const versions = {
         display: dependency.version,
-        effective: versioning.getEffectiveVersion(dependency.version, allVersions),
+        effective: project.isClassic
+          ? dependency.version
+          : versioning.getEffectiveVersion(dependency.version, allVersions),
         ...latestVersions,
       };
       const packageScore = versioning.calculatePackageScore(versions);
