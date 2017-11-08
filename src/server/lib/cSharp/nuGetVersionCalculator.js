@@ -1,5 +1,7 @@
-import semver from 'semver';
-import VersionError from './VersionError';
+import versionCalculator from 'semver';
+import NuGetWildcardMatcher from './NuGetWildcardMatcher';
+import NuGetRangeMatcher from './NuGetRangeMatcher';
+import NuGetExactMatcher from './NuGetExactMatcher';
 
 const prereleaseRegex = /^\d+\.\d+\.\d+\.\d+(-\S+)$/;
 const versionPartsRegex = /^(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))?(-\S+)?$/;
@@ -10,7 +12,7 @@ const getVersionParts = (version) => {
   const match = versionPartsRegex.exec(version);
 
   if (!match) {
-    throw new VersionError(`${version} is not a valid 4 digit version.`, version);
+    throw new TypeError(`Invalid Version: ${version}`);
   }
 
   return {
@@ -37,18 +39,18 @@ const compareStable = (parts1, parts2, comparison) => {
 };
 
 export default {
-  prerelease: (version) => {
+  prerelease(version) {
     const match = prereleaseRegex.exec(version);
     if (match) {
       return match[1]
-        ? semver.prerelease(`0.0.0${match[1]}`)
+        ? versionCalculator.prerelease(`0.0.0${match[1]}`)
         : null;
     }
 
-    return semver.prerelease(version);
+    return versionCalculator.prerelease(version);
   },
 
-  eq: (version1, version2) => {
+  eq(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -65,7 +67,7 @@ export default {
     return true;
   },
 
-  gt: (version1, version2) => {
+  gt(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -73,10 +75,10 @@ export default {
 
     return stableComparison != null
       ? stableComparison
-      : semver.gt(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
+      : versionCalculator.gt(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
   },
 
-  lt: (version1, version2) => {
+  lt(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -84,10 +86,10 @@ export default {
 
     return stableComparison != null
       ? stableComparison
-      : semver.lt(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
+      : versionCalculator.lt(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
   },
 
-  gte: (version1, version2) => {
+  gte(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -95,10 +97,10 @@ export default {
 
     return stableComparison != null
       ? stableComparison
-      : semver.gte(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
+      : versionCalculator.gte(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
   },
 
-  lte: (version1, version2) => {
+  lte(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -106,10 +108,10 @@ export default {
 
     return stableComparison != null
       ? stableComparison
-      : semver.lte(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
+      : versionCalculator.lte(`0.0.0${parts1.prerelease}`, `0.0.0${parts2.prerelease}`);
   },
 
-  diff: (version1, version2) => {
+  diff(version1, version2) {
     const parts1 = getVersionParts(version1);
     const parts2 = getVersionParts(version2);
 
@@ -126,5 +128,28 @@ export default {
     }
 
     return parts1.prerelease !== parts2.prerelease ? 'prerelease' : null;
+  },
+
+  satisfies(versionRange, version) {
+    const rangeMatchers = [
+      NuGetWildcardMatcher,
+      NuGetRangeMatcher,
+      NuGetExactMatcher,
+    ];
+
+    let rangeMatcher;
+
+    if (!rangeMatchers.some((Matcher) => {
+      const match = Matcher.regex.exec(version);
+      if (match) {
+        rangeMatcher = new Matcher(match);
+        return true;
+      }
+      return false;
+    })) {
+      throw new TypeError(`Invalid Version: ${version}`);
+    }
+
+    return rangeMatcher.satisfies(version);
   },
 };

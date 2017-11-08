@@ -1,5 +1,4 @@
-import semver from 'semver';
-import VersionError from '../versioning/VersionError';
+import versionCalculator from './nuGetVersionCalculator';
 
 const wildcardVersionRegex = /^(\d+|\*)(\.(\d+|\*))?(\.(\d+|\*))?(\.(\d+|\*))?(-\S+|\*)?$/;
 const versionRegex = /^(\d+)(\.(\d+))?(\.(\d+))?(\.(\d+))?(-\S+)?$/;
@@ -18,7 +17,7 @@ const getVersionParts = match => (
   }
 );
 
-export default class WildcardVersionMatcher {
+export default class NuGetWildcardMatcher {
   static regex = wildcardVersionRegex;
 
   constructor(match) {
@@ -29,7 +28,7 @@ export default class WildcardVersionMatcher {
     const match = versionRegex.exec(version);
 
     if (!match) {
-      throw new VersionError(`${version} is not a valid 4 digit version`);
+      throw new TypeError(`Invalid Version: ${version}`);
     }
 
     const versionParts = getVersionParts(match);
@@ -45,7 +44,7 @@ export default class WildcardVersionMatcher {
     }
 
     if (this.parts.prerelease !== '-*' && versionParts.prerelease !== this.parts.prerelease) {
-      return semver.gt(`0.0.0${versionParts.prerelease}`, `0.0.0${this.parts.prerelease}`);
+      return versionCalculator.gt(`0.0.0${versionParts.prerelease}`, `0.0.0${this.parts.prerelease}`);
     }
 
     return true;

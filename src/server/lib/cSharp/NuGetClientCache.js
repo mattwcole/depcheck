@@ -4,6 +4,8 @@ export default class NuGetClientCache {
     this.cache = cache;
   }
 
+  // TODO: Support batch gets for less trips to cache.
+
   getVersions(packageId) {
     const key = `nuget-versions-${packageId}`;
     return this.cache.cacheFirst(key,

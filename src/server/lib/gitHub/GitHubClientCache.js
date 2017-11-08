@@ -4,6 +4,8 @@ export default class GitHubClientCache {
     this.cache = cache;
   }
 
+  // TODO: Support both operations in a single call for less trips to cache.
+
   getLanguage(owner, repo) {
     const key = `github-language-${owner}/${repo}`;
     return this.cache.cacheFirst(key,

@@ -1,5 +1,4 @@
 import parseXml from '../xmlParser';
-import * as versioning from './nuGetVersioning';
 import PropsResolver from './PropsResolver';
 
 // TODO: Make other regex patterns use non capturing groups.
@@ -58,9 +57,28 @@ const getClassicCsprojDependencies = (project) => {
 };
 
 export default class CSharpProject {
-  constructor(gitHubClient, nuGetClient) {
+  constructor(gitHubClient, nuGetClient, versionUtils) {
     this.gitHubClient = gitHubClient;
     this.nuGetClient = nuGetClient;
+    this.versionUtils = versionUtils;
+  }
+
+  async getRepoDependencySummary(owner, repo) {
+    const dependenciesByProject = await this.getDependenciesByProject(owner, repo);
+    const projectScores = [];
+
+    const dependencySummaries = await Promise.all(
+      dependenciesByProject.map(async (project) => {
+        const dependencySummary = await this.getProjectDependencySummary(project);
+        projectScores.push(dependencySummary.score);
+        return dependencySummary;
+      }),
+    );
+
+    return {
+      score: this.versionUtils.calculateRepoScore(projectScores),
+      projects: dependencySummaries,
+    };
   }
 
   async getDependenciesByProject(owner, repo) {
@@ -101,38 +119,20 @@ export default class CSharpProject {
     return projectDependencies;
   }
 
-  async getRepoDependencySummary(owner, repo) {
-    const dependenciesByProject = await this.getDependenciesByProject(owner, repo);
-    const projectScores = [];
-
-    const dependencySummaries = await Promise.all(
-      dependenciesByProject.map(async (project) => {
-        const dependencySummary = await this.getProjectDependencySummary(project);
-        projectScores.push(dependencySummary.score);
-        return dependencySummary;
-      }),
-    );
-
-    return {
-      score: versioning.calculateRepoScore(projectScores),
-      projects: dependencySummaries,
-    };
-  }
-
   async getProjectDependencySummary(project) {
     const packageScores = [];
 
     const dependencies = await Promise.all(project.dependencies.map(async (dependency) => {
       const allVersions = await this.nuGetClient.getVersions(dependency.id);
-      const latestVersions = versioning.getLatestVersions(allVersions);
+      const latestVersions = this.versionUtils.getLatestVersions(allVersions);
       const versions = {
         display: dependency.version,
         effective: project.isClassic
           ? dependency.version
-          : versioning.getEffectiveVersion(dependency.version, allVersions),
+          : this.versionUtils.getEffectiveVersion(dependency.version, allVersions),
         ...latestVersions,
       };
-      const packageScore = versioning.calculatePackageScore(versions);
+      const packageScore = this.versionUtils.calculatePackageScore(versions);
 
       packageScores.push(packageScore);
 
@@ -146,7 +146,7 @@ export default class CSharpProject {
     return {
       name: project.name,
       path: project.path,
-      score: versioning.calculateProjectScore(packageScores),
+      score: this.versionUtils.calculateProjectScore(packageScores),
       dependencies,
     };
   }
